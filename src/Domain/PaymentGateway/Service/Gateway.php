@@ -10,6 +10,39 @@ use Domain\PaymentGateway\Support\Debugger;
 use RuntimeException;
 use InvalidArgumentException;
 
+/**
+ * Class Gateway
+ *
+ * Handles integration with the payment gateway for both direct and hosted payment requests.
+ * Provides methods to prepare, sign, send, and verify payment requests and responses.
+ *
+ * @package Domain\PaymentGateway\Service
+ *
+ * @property static string $hostedUrl   URL for hosted payment form.
+ * @property static string $directUrl   URL for direct payment API.
+ * @property static ?string $merchantID Merchant identifier.
+ * @property static ?string $merchantPwd Merchant password.
+ * @property static ?string $merchantSecret Merchant secret key for signing requests.
+ * @property static ?string $proxyUrl   Optional proxy URL for outgoing requests.
+ * @property static bool $debug         Enable or disable debug logging.
+ *
+ * @const int RC_SUCCESS                      Response code for successful transaction.
+ * @const int RC_DO_NOT_HONOR                 Response code for "Do Not Honor".
+ * @const int RC_NO_REASON_TO_DECLINE         Response code for "No Reason To Decline".
+ * @const int RC_3DS_AUTHENTICATION_REQUIRED  Response code for 3DS authentication required.
+ *
+ * @method static array directRequest(array $request, ?array $options = null)
+ *         Sends a direct API request to the payment gateway.
+ *         Prepares and signs the request, sends it via cURL or HTTP stream, and verifies the response.
+ *         Throws RuntimeException on communication or verification failure.
+ *         Returns the parsed response array.
+ *
+ * @method static string hostedRequest(array $request, ?array $options = null)
+ *         Prepares a hosted payment form for the gateway.
+ *         Signs the request and generates an HTML form for user redirection.
+ *         Returns the HTML form as a string.
+ */
+
 class Gateway
 {
     public static string $hostedUrl = 'https://gw1.tponlinepayments.com/paymentform/';
@@ -25,7 +58,7 @@ class Gateway
     const RC_NO_REASON_TO_DECLINE = 85;
     const RC_3DS_AUTHENTICATION_REQUIRED = 0x1010A;
 
-    public static function directRequest(array $request, array $options = null): array
+static public function directRequest(array $request, ?array $options = null)
     {
         Debugger::debug(__METHOD__ . '() - args=', func_get_args());
 
@@ -94,7 +127,7 @@ class Gateway
         return $response;
     }
 
-    public static function hostedRequest(array $request, array $options = null): string
+static public function hostedRequest(array $request, ?array $options = null)
     {
         Debugger::debug(__METHOD__ . '() - args=', func_get_args());
 

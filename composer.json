@@ -14,5 +14,7 @@
             "email": "dibakar.chakraborty15@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
 }

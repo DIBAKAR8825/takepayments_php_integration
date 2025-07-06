@@ -1,15 +1,23 @@
 <?php
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
-
 use Domain\PaymentGateway\Service\Gateway;
+use Dotenv\Dotenv;
 
-$CSGW = new Gateway;
-$key = 'S89o46guh1221';
+// Load environment variables
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+// Set Gateway credentials from .env
+Gateway::$merchantID = $_ENV['MERCHANT_ID'];
+Gateway::$merchantSecret = $_ENV['MERCHANT_SECRET'];
+Gateway::$debug = filter_var($_ENV['DEBUG'], FILTER_VALIDATE_BOOLEAN);
+
+// Prepare transaction
+$key = Gateway::$merchantSecret;
 
 $tran = [
-    'merchantID' => '118478',
+    'merchantID' => Gateway::$merchantID,
     'merchantSecret' => $key,
     'action' => 'SALE',
     'type' => 1,
@@ -22,4 +30,4 @@ $tran = [
     'redirectURL' => 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
 ];
 
-echo $CSGW->hostedRequest($tran);
+echo Gateway::hostedRequest($tran);
