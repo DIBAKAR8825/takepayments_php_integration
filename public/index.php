@@ -13,21 +13,33 @@ Gateway::$merchantID = $_ENV['MERCHANT_ID'];
 Gateway::$merchantSecret = $_ENV['MERCHANT_SECRET'];
 Gateway::$debug = filter_var($_ENV['DEBUG'], FILTER_VALIDATE_BOOLEAN);
 
-// Prepare transaction
-$key = Gateway::$merchantSecret;
+// Load payment data from JSON file
+$responseFile = __DIR__ . '/response.json';
+if (!file_exists($responseFile)) {
+    die('Error: response.json file not found');
+}
 
+$responseData = json_decode(file_get_contents($responseFile), true);
+if (!isset($responseData['data'])) {
+    die('Error: Invalid response.json structure');
+}
+
+$paymentData = $responseData['data'];
+
+// Prepare transaction using data from JSON
 $tran = [
     'merchantID' => Gateway::$merchantID,
-    'merchantSecret' => $key,
+    'merchantSecret' => Gateway::$merchantSecret,
     'action' => 'SALE',
     'type' => 1,
-    'countryCode' => 826,
-    'currencyCode' => 826,
-    'amount' => 1001,
-    'orderRef' => 'Test purchase',
+    'countryCode' => $paymentData['countryCode'],
+    'currencyCode' => $paymentData['currencyCode'],
+    'amount' => $paymentData['amount'],
+    'orderRef' => $paymentData['orderRef'],
     'formResponsive' => 'Y',
-    'transactionUnique' => uniqid(),
+    'transactionUnique' => $paymentData['transactionUnique'],
     'redirectURL' => 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
 ];
 
+// Output the payment form
 echo Gateway::hostedRequest($tran);
