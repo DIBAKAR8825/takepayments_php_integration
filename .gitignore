@@ -1,0 +1,22 @@
+
+/vendor/
+/.idea/
+/.vscode/
+*.log
+*.cache
+*.env
+.DS_Store
+
+# OS-specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# PHPStorm / Xdebug
+.phpunit.result.cache
+coverage/
+build/
+
+# Local dev
+node_modules/
+.env.local
