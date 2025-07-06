@@ -1,0 +1,13 @@
+{
+  "status": "success",
+  "code": 200,
+  "message": "Payment data retrieved successfully",
+  "data": {
+    "countryCode": 826,
+    "currencyCode": 826,
+    "amount": 1001,
+    "orderRef": "Test Purchase #1234",
+    "transactionUnique": "abc123xyz456"
+  },
+  "timestamp": "2025-07-06T14:23:55Z"
+}

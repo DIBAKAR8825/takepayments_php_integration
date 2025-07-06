@@ -128,40 +128,51 @@ static public function directRequest(array $request, ?array $options = null)
     }
 
 static public function hostedRequest(array $request, ?array $options = null)
-    {
-        Debugger::debug(__METHOD__ . '() - args=', func_get_args());
+{
+    Debugger::debug(__METHOD__ . '() - args=', func_get_args());
 
-        RequestPreparer::prepare($request, $options, $secret, $directUrl, $hostedUrl);
+    RequestPreparer::prepare($request, $options, $secret, $directUrl, $hostedUrl);
 
-        if (!isset($request['redirectURL'])) {
-            $request['redirectURL'] = (array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        }
-
-        if ($secret) {
-            $request['signature'] = SignatureHelper::sign($request, $secret, true);
-        }
-
-        $ret = '<form method="post" ' .
-            (isset($options['formAttrs']) ? $options['formAttrs'] : '') .
-            ' action="' . htmlentities($hostedUrl, ENT_COMPAT, 'UTF-8') . "\">\n";
-
-        foreach ($request as $name => $value) {
-            $ret .= HtmlHelper::fieldToHtml($name, $value);
-        }
-
-        if (isset($options['submitImage'])) {
-            $ret .= '<input ' . (isset($options['submitAttrs']) ? $options['submitAttrs'] : '') .
-                ' type="image" src="' . htmlentities($options['submitImage'], ENT_COMPAT, 'UTF-8') . "\">\n";
-        } elseif (isset($options['submitHtml'])) {
-            $ret .= '<button type="submit" ' . (isset($options['submitAttrs']) ? $options['submitAttrs'] : '') .
-                ">{$options['submitHtml']}</button>\n";
-        } else {
-            $ret .= '<input ' . (isset($options['submitAttrs']) ? $options['submitAttrs'] : '') .
-                ' type="submit" value="' . (isset($options['submitText']) ? htmlentities($options['submitText'], ENT_COMPAT, 'UTF-8') : 'Pay Now') . "\">\n";
-        }
-
-        $ret .= "</form>\n";
-        Debugger::debug(__METHOD__ . '() - ret=', $ret);
-        return $ret;
+    if (!isset($request['redirectURL'])) {
+        $request['redirectURL'] = (array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     }
+
+    if ($secret) {
+        $request['signature'] = SignatureHelper::sign($request, $secret, true);
+    }
+
+    // Start form with Bootstrap styling
+    $ret = '<form method="post" class="p-4 border rounded" ' .
+        (isset($options['formAttrs']) ? $options['formAttrs'] : '') .
+        ' action="' . htmlentities($hostedUrl, ENT_COMPAT, 'UTF-8') . "\">\n";
+
+    foreach ($request as $name => $value) {
+        if ($name === 'signature') {
+            $ret .= '<input type="hidden" name="' . htmlentities($name, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities($value, ENT_QUOTES, 'UTF-8') . "\">\n";
+        } else {
+            $ret .= '<div class="mb-3">
+                        <label class="form-label">' . htmlentities($name, ENT_QUOTES, 'UTF-8') . '</label>
+                        <input type="text" class="form-control" name="' . htmlentities($name, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities($value, ENT_QUOTES, 'UTF-8') . '">
+                    </div>' . "\n";
+        }
+    }
+
+    if (isset($options['submitImage'])) {
+        $ret .= '<input ' . (isset($options['submitAttrs']) ? $options['submitAttrs'] : '') .
+            ' type="image" src="' . htmlentities($options['submitImage'], ENT_COMPAT, 'UTF-8') . "\">\n";
+    } elseif (isset($options['submitHtml'])) {
+        $ret .= '<button type="submit" class="btn btn-primary w-100" ' . (isset($options['submitAttrs']) ? $options['submitAttrs'] : '') .
+            ">{$options['submitHtml']}</button>\n";
+    } else {
+        $ret .= '<button type="submit" class="btn btn-primary w-100" ' . (isset($options['submitAttrs']) ? $options['submitAttrs'] : '') .
+            '>' . (isset($options['submitText']) ? htmlentities($options['submitText'], ENT_COMPAT, 'UTF-8') : 'Pay Now') . "</button>\n";
+    }
+
+    $ret .= "</form>\n";
+
+    //Debugger::debug(__METHOD__ . '() - ret=', $ret);
+
+    return $ret;
+}
+
 }
