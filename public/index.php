@@ -1,13 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../src/Domain/PaymentGateway/Service/Gateway.php';
-spl_autoload_register(function ($class) {
-    $base = __DIR__ . '/../src/';
-    $classPath = $base . str_replace('\\', '/', $class) . '.php';
-    if (file_exists($classPath)) {
-        require $classPath;
-    }
-});
+require_once __DIR__ . '/../vendor/autoload.php';
+
 
 use Domain\PaymentGateway\Service\Gateway;
 
